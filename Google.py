@@ -5,11 +5,10 @@ import requests
 
 
 class Google_Translate:
-    def __init__(self, words):
+    def __init__(self, q = ''):
+        self.method = 'Google'
         self.url = "https://translate.google.cn"
-        self.words = words
-        self.tk = self.get_tk(self.words)
-        self.path = "/translate_a/single?client=webapp&sl=auto&tl=zh-CN&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&source=bh&ssel=0&tsel=0&kc=1&tk={0}&q={1}".format(self.tk, self.words)
+        self.q = q
         self.headers = {
             'accept': '*/*',
             'accept-encoding':'gzip, deflate, br',
@@ -73,11 +72,15 @@ class Google_Translate:
         a %= 1E6
         return str(int(a)) + '.' + str(int(a) ^ h)
 
-
-
     def translate(self):
-        url = self.url + self.path
-        resp = requests.get(url = url, headers = self.headers)
+        tk = self.get_tk(self.q)
+        path = "/translate_a/single?client=webapp&sl=auto&tl=zh-CN&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&source=bh&ssel=0&tsel=0&kc=1&tk={0}&q={1}".format(tk, self.q)
+        proxies = {
+            'http': 'socks5://user:pass@127.0.0.1:1080',
+            'https': 'socks5://user:pass@127.0.0.1:1080'
+        }
+        url = self.url + path
+        resp = requests.get(url = url, headers = self.headers, proxies = proxies)
         trans_result = json.loads(resp.content)[0][0][0]
         return trans_result
 

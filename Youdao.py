@@ -8,9 +8,11 @@ import requests
 
 
 class Youdao_translate:
-    def __init__(self, words):
-        self.url = 'http://fanyi.youdao.com/translate?smartresult=dict&smartresult=rule&sessionFrom='
-        self.words = words
+    def __init__(self, q = ''):
+        self.method = 'Youdao'
+        self.url = 'http://fanyi.youdao.com/translate_o?smartresult=dict&smartresult=rule'
+        # 'http://fanyi.youdao.com/translate?smartresult=dict&smartresult=rule&sessionFrom='
+        self.q = q
         self.headers = {
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'Accept-Encoding': 'gzip, deflate',
@@ -23,20 +25,6 @@ class Youdao_translate:
             'Referer': 'http://fanyi.youdao.com/',
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 Chrome/70.0.3538.77 Safari/537.36',
             'X-Requested-With': 'XMLHttpRequest'
-        }
-        self.form_data = {
-            "i": words,
-            "from": "AUTO",
-            "to": "AUTO",
-            "smartresult": "dict",
-            "client": "fanyideskweb",
-            "salt": self.get_salt(),
-            "sign": "",
-            "doctype": "json",
-            "version": "2.1",
-            "keyfrom": "fanyi.web",
-            "action": "FY_BY_CLICKBUTTION",
-            "typoResult": "false"
         }
 
     # js的代码： f = "" + ((new Date).getTime() + parseInt(10 * Math.random(), 10)),
@@ -52,9 +40,9 @@ class Youdao_translate:
     # var g = n.md5(u + d + f + c);
     # sign 通多几个数相加然后进行 md5 加密
     def get_sign(self):
-        u = self.form_data['client']
-        d = self.form_data['i']
-        f = self.form_data['salt']
+        u = "fanyideskweb"
+        d = self.q
+        f = self.get_salt()
         c = "rY0D^0'nM0}g5Mm1z%1G4"
  
         str_data = u + str(d) + str(f) + c
@@ -64,13 +52,27 @@ class Youdao_translate:
         m.update(str_data.encode('utf-8'))
         sign = m.hexdigest()
  
-        return sign
+        return f, sign
 
     # 翻译过程
     def translate(self):
-        self.form_data['sign'] = self.get_sign()
-        resp = requests.post(url = self.url, data = self.form_data, headers = self.headers)
-        trans_result = json.loads(resp.content)['translateResult'][0][0]['tgt']
+        salt, sign = self.get_sign()
+        data = {
+            "i": self.q,
+            "from": "AUTO",
+            "to": "AUTO",
+            "smartresult": "dict",
+            "client": "fanyideskweb",
+            "salt": salt,
+            "sign": sign,
+            "doctype": "json",
+            "version": "2.1",
+            "keyfrom": "fanyi.web",
+            "action": "FY_BY_CLICKBUTTION",
+            "typoResult": "false"
+        }
+        resp = requests.post(url = self.url, data = data, headers = self.headers)
+        trans_result = json.loads(resp.content).get('translateResult')[0][0].get('tgt')
         return trans_result
         
  

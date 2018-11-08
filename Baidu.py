@@ -7,9 +7,10 @@ import requests
 
 
 class Baidu_Translate:
-    def __init__(self, words):
+    def __init__(self, q = ''):
+        self.method = 'Baidu'
         self.url = 'https://fanyi.baidu.com/transapi'
-        self.q = words
+        self.q = q
         self.headers = {
             'Accept': '*/*',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -21,15 +22,6 @@ class Baidu_Translate:
             'Referer': 'https://fanyi.baidu.com/',
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 Chrome/70.0.3538.77 Safari/537.36',
             'X-Requested-With': 'XMLHttpRequest'
-        }
-        self.data = {
-            'from': 'en',
-            'to': 'zh',
-            'query': self.q,
-            'transtype': 'translang',
-            'simple_means_flag': '3',
-            'sign': '',
-            'token': ''
         }
 
     def get_sign(self,gtk,r):
@@ -129,10 +121,19 @@ class Baidu_Translate:
         return token, gtk
 
     def translate(self):
+        data = {
+            'from': 'en',
+            'to': 'zh',
+            'query': self.q,
+            'transtype': 'translang',
+            'simple_means_flag': '3',
+            'sign': '',
+            'token': ''
+        }
         token, gtk = self.get_token_gtk()
-        self.data['sign'] = str(self.get_sign(gtk, self.q))
-        self.data['token'] = str(token)
-        resp = requests.post(url = self.url, data = self.data, headers = self.headers)
+        data['sign'] = str(self.get_sign(gtk, self.q))
+        data['token'] = str(token)
+        resp = requests.post(url = self.url, data = data, headers = self.headers)
         trans_result = json.loads(resp.content).get('data')[0].get('dst')
         return trans_result
 
