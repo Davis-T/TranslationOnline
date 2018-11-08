@@ -81,8 +81,13 @@ class Google_Translate:
         }
         url = self.url + path
         resp = requests.get(url = url, headers = self.headers, proxies = proxies)
-        trans_result = json.loads(resp.content)[0][0][0]
-        return trans_result
+        try:
+            trans_result = json.loads(resp.content)[0][0][0]
+        except:
+            trans_result = ''
+            print(json.loads(resp.content))
+        finally:
+            return trans_result
 
 
 if(__name__ == '__main__'):

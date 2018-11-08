@@ -134,8 +134,13 @@ class Baidu_Translate:
         data['sign'] = str(self.get_sign(gtk, self.q))
         data['token'] = str(token)
         resp = requests.post(url = self.url, data = data, headers = self.headers)
-        trans_result = json.loads(resp.content).get('data')[0].get('dst')
-        return trans_result
+        try:
+            trans_result = json.loads(resp.content).get('data')[0].get('dst')
+        except:
+            trans_result = ''
+            print(json.loads(resp.content))
+        finally:
+            return trans_result
 
 if(__name__ == '__main__'):
     w = 'hello world'

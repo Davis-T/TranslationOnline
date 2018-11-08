@@ -72,8 +72,13 @@ class Youdao_translate:
             "typoResult": "false"
         }
         resp = requests.post(url = self.url, data = data, headers = self.headers)
-        trans_result = json.loads(resp.content).get('translateResult')[0][0].get('tgt')
-        return trans_result
+        try:
+            trans_result = json.loads(resp.content).get('translateResult')[0][0].get('tgt')
+        except:
+            trans_result = ''
+            print(json.loads(resp.content))
+        finally:
+            return trans_result
         
  
 if(__name__ == '__main__'):
