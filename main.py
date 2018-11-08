@@ -8,7 +8,7 @@ B = Baidu_Translate()
 Y = Youdao_translate()
 
 def translate(T):
-    print("{}：{}".format(T.method, T.translate()))
+    print("{}\t：\t{}".format(T.method, T.translate()))
 
 if(__name__ == '__main__'):
     while True:
